@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package mock;
+option go_package = "https://github.com/frejabv/DisysMockExam/;protobuf";
+
+service Mock {
+  rpc Increment (IncrementRequest) returns (IncrementReply) {}
+}
+
+message IncrementRequest {}
+
+message IncrementReply {
+	int32 newValue = 1;
+}
