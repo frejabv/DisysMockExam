@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"log"
 	"net"
+	"os"
+	"strings"
 
 	"DisysMockExam/Mock/protobuf"
 
@@ -17,7 +20,13 @@ type server struct {
 var value int32 = -1
 
 func main() {
-	lis, err := net.Listen("tcp", ":8080")
+	log.Print("Welcome Server. You need to write 0, 1 or 2:")
+	reader := bufio.NewReader(os.Stdin)
+	text, _ := reader.ReadString('\n')
+	port := strings.Replace(text, "\n", "", 1)
+
+	lis, err := net.Listen("tcp", ":808"+port)
+	//lis, err := net.Listen("tcp", ":8080")
 
 	if err != nil { //error before listening
 		log.Fatalf("failed to listen: %v", err)
