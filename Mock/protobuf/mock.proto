@@ -5,6 +5,7 @@ option go_package = "https://github.com/frejabv/DisysMockExam/;protobuf";
 
 service Mock {
   rpc Increment (IncrementRequest) returns (IncrementReply) {}
+  rpc SetValue (SetValueRequest) returns (SetValueReply) {}
 }
 
 message IncrementRequest {}
@@ -12,3 +13,9 @@ message IncrementRequest {}
 message IncrementReply {
 	int32 newValue = 1;
 }
+
+message SetValueRequest {
+  int32 value = 1;
+}
+
+message SetValueReply {}

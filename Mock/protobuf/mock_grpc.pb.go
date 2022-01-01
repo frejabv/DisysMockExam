@@ -19,6 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MockClient interface {
 	Increment(ctx context.Context, in *IncrementRequest, opts ...grpc.CallOption) (*IncrementReply, error)
+	SetValue(ctx context.Context, in *SetValueRequest, opts ...grpc.CallOption) (*SetValueReply, error)
 }
 
 type mockClient struct {
@@ -38,11 +39,21 @@ func (c *mockClient) Increment(ctx context.Context, in *IncrementRequest, opts .
 	return out, nil
 }
 
+func (c *mockClient) SetValue(ctx context.Context, in *SetValueRequest, opts ...grpc.CallOption) (*SetValueReply, error) {
+	out := new(SetValueReply)
+	err := c.cc.Invoke(ctx, "/mock.Mock/SetValue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MockServer is the server API for Mock service.
 // All implementations must embed UnimplementedMockServer
 // for forward compatibility
 type MockServer interface {
 	Increment(context.Context, *IncrementRequest) (*IncrementReply, error)
+	SetValue(context.Context, *SetValueRequest) (*SetValueReply, error)
 	mustEmbedUnimplementedMockServer()
 }
 
@@ -52,6 +63,9 @@ type UnimplementedMockServer struct {
 
 func (UnimplementedMockServer) Increment(context.Context, *IncrementRequest) (*IncrementReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Increment not implemented")
+}
+func (UnimplementedMockServer) SetValue(context.Context, *SetValueRequest) (*SetValueReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetValue not implemented")
 }
 func (UnimplementedMockServer) mustEmbedUnimplementedMockServer() {}
 
@@ -84,6 +98,24 @@ func _Mock_Increment_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Mock_SetValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetValueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MockServer).SetValue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/mock.Mock/SetValue",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MockServer).SetValue(ctx, req.(*SetValueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Mock_ServiceDesc is the grpc.ServiceDesc for Mock service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -95,7 +127,11 @@ var Mock_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "Increment",
 			Handler:    _Mock_Increment_Handler,
 		},
+		{
+			MethodName: "SetValue",
+			Handler:    _Mock_SetValue_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "protobuf/mock.proto",
+	Metadata: "Mock/protobuf/mock.proto",
 }

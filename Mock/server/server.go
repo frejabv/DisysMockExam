@@ -26,7 +26,6 @@ func main() {
 	port := strings.Replace(text, "\n", "", 1)
 
 	lis, err := net.Listen("tcp", ":808"+port)
-	//lis, err := net.Listen("tcp", ":8080")
 
 	if err != nil { //error before listening
 		log.Fatalf("failed to listen: %v", err)
@@ -41,7 +40,13 @@ func main() {
 }
 
 func (s *server) Increment(ctx context.Context, in *protobuf.IncrementRequest) (*protobuf.IncrementReply, error) {
-	log.Println("Server Received increment")
+	log.Println("Server received increment")
 	value += 1
 	return &protobuf.IncrementReply{NewValue: value}, nil
+}
+
+func (s *server) SetValue(ctx context.Context, in *protobuf.SetValueRequest) (*protobuf.SetValueReply, error) {
+	log.Println("Server received set value request")
+	value = in.Value
+	return &protobuf.SetValueReply{}, nil
 }
